@@ -1,0 +1,25 @@
+name: 'cicd-docker-compose-test-action'
+description: 'Action to check application test'
+author: 'lelered'
+
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Check out code
+      id: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+    -
+      name: Create Cache Registry
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.IMAGE_CACHE_DIR }}
+        key: ${{ runner.os }}-docker-images-v${{ env.IMAGE_KEY_VERSION }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-docker-images-v${{ env.IMAGE_KEY_VERSION }}-
+    -
+      name: Run tests
+      shell: bash
+      run: docker compose run --rm test
